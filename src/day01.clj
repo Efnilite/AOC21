@@ -1,9 +1,7 @@
 (ns day01
   (:require [clojure.string :as str]))
 
-
 ; part one
-
 
 (->> (slurp "resources/01.txt")
      (str/split-lines)
@@ -12,9 +10,7 @@
      (filter #(> (second %) (first %)))
      (count))
 
-
 ; part 2
-
 
 (->> (slurp "resources/01.txt")
      (str/split-lines)
