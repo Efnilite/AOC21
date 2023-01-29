@@ -1,5 +1,6 @@
 (ns day04
-  (:require [clojure.string :as str]))
+  (:require
+    [clojure.string :as str]))
 
 ; part 1
 
@@ -35,27 +36,37 @@
                       })
                    boards))
 
+(defn finished-boards [data]
+  (->> data
+       (filter
+         (fn [board-data]
+           (some #{0}
+                 (->> board-data
+                      (vals)
+                      (map
+                        (fn [board]
+                          (map
+                            (fn [row]
+                              (count row))
+                            board)))
+                      (flatten)))))))
+
 (defn remove-same-values [m k v]
   (map
     (fn [row]
-      (remove #(= v %) row))
+      (remove (partial = v) row))
     (get m k)))
 
+(defn filter-same-value [v data]
+  (zipmap
+    [:rows :cols]
+    (map
+      #(remove-same-values data % v)
+      (keys data)))
+  )
+
 (loop [rem nums data boards-data previous-num (first nums)]
-  (let [finished-boards
-        (->> data
-             (filter
-               (fn [board-data]
-                 (some #{0}
-                       (->> board-data
-                            (vals)
-                            (map
-                              (fn [board]
-                                (map
-                                  (fn [row]
-                                    (count row))
-                                  board)))
-                            (flatten))))))]
+  (let [finished-boards (finished-boards data)]
 
     (if (not (empty? finished-boards))
       (*
@@ -70,11 +81,31 @@
       (recur
         (rest rem)
         (map
-          (fn [board-data]
-            (zipmap [:rows :cols]
-                    (map
-                      #(remove-same-values board-data % (first rem))
-                      (keys board-data))))
-
+          (partial filter-same-value (first rem))
           data)
         (first rem)))))
+
+; part 2
+
+(loop [rem nums data boards-data]
+  (if (= 1 (count data))
+    (*
+      (first rem)
+      (->> data
+           (map (partial filter-same-value (first rem)))
+           (first)
+           (vals)
+           (first)
+           (flatten)
+           (apply +)))
+
+    (recur
+      (rest rem)
+      (->> data
+           (map (partial filter-same-value (first rem)))
+           (remove
+             (fn [board]
+               (->> board
+                    (vals)
+                    (map (partial some empty?))
+                    (some true?))))))))

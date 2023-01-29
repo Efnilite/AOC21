@@ -7,44 +7,47 @@
                      (str/split-lines)
                      (map seq)))
 
-(def frequencies* (->> characters
-                       (first)
-                       (count)
-                       (range)
-                       (map (fn [i] (map #(nth % i) characters)))
-                       (map frequencies)
-                       (map #(sort-by val > %))))
+(defn frequencies' [characters]
+  (->> characters
+       (first)
+       (count)
+       (range)
+       (map (fn [i] (map #(nth % i) characters)))
+       (map frequencies)
+       (map (partial sort-by val >))))
 
 (defn binary-to-10 [binary-digits]
   (Integer/parseInt (str/join binary-digits) 2))
 
-(def gamma (map ffirst frequencies*))
-(def epsilon (map #(first (second %)) frequencies*))
+(def gamma (map ffirst (frequencies' characters)))
+(def epsilon (map #(first (second %)) (frequencies' characters)))
 
 (* (binary-to-10 gamma) (binary-to-10 epsilon))
 
-; part 2 (doesn't work yet)
+; part 2
 
-(defn sort-map-by-values [m]
-  (into {} (sort-by second (map (fn [[k v]] [k v]) m))))
-
-(defn frequencies' [rarity chars]
-  (->> chars
+(defn frequencies'' [characters preferred-digit]
+  (->> characters
        (first)
        (count)
        (range)
-       (map (fn [i] (map #(nth % i) chars)))
+       (map (fn [i] (map #(nth % i) characters)))
        (map frequencies)
-       (map sort-map-by-values)
-       (map (if (zero? rarity) ffirst #(first (last %))))))
+       (map
+         #(sort
+            (fn [x y]
+              (if (= (last x) (last y)) preferred-digit (compare (last y) (last x))))
+            %))))
 
-(defn rating [rarity]
-  (loop [rem characters bit 0]
-    (println (count rem) (frequencies' rarity rem) rem)
-    (if (>= 1 (count rem))
-      (flatten rem)
-      (recur
-        (filter #(= (nth (frequencies' rarity rem) bit) (nth % bit)) rem)
-        (inc bit)))))
+(defn walk [preferred-digit]
+  (loop [rem characters i 0]
+    (if (= 1 (count rem))
+      (first rem)
+      (let [freqs (nth (frequencies'' rem (if (zero? preferred-digit) 1 -1)) i)
+            common-bit (first (nth freqs preferred-digit))]
+        (recur
+          (filter #(= common-bit (nth % i)) rem)
+          (inc i)))
+      )))
 
-(* (binary-to-10 (rating 0)) (binary-to-10 (rating 1)))
+(* (binary-to-10 (walk 0)) (binary-to-10 (walk 1)))
