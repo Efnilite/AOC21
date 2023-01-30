@@ -18,13 +18,13 @@
 
 ; part 2
 
-(defn positions [current next]
-  (let [parts (str/split next #" ")
+(defn positions [current-position-data next-datas]
+  (let [parts (str/split next-datas #" ")
         type (first parts)
         value (Integer/parseInt (last parts))]
     (map +
-         current
-         (case type "forward" [value (* value (last current)) 0]
+         current-position-data
+         (case type "forward" [value (* value (last current-position-data)) 0]
                     "down" [0 0 value]
                     "up" [0 0 (- value)]))))
 

@@ -16,7 +16,7 @@
      (str/split-lines)
      (map #(Integer/parseInt %))
      (partition 3 1)
-     (map #(apply + %))
+     (map (partial apply +))
      (partition 2 1)
      (filter #(> (second %) (first %)))
      (count))

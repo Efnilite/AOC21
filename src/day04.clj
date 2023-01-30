@@ -15,14 +15,15 @@
 (def boards (->> lines
                  (rest)
                  (partition 5)
-                 (map (fn [board]
-                        (map
-                          (fn [row]
-                            (->> row
-                                 (re-seq #"\d+")
-                                 (map str/trim)
-                                 (map #(Integer/parseInt %))))
-                          board)))))
+                 (map
+                   (fn [board]
+                     (map
+                       (fn [row]
+                         (->> row
+                              (re-seq #"\d+")
+                              (map str/trim)
+                              (map #(Integer/parseInt %))))
+                       board)))))
 
 (def boards-data (map
                    (fn [board]
@@ -50,21 +51,21 @@
                             board)))
                       (flatten)))))))
 
-(defn remove-same-values [m k v]
+(defn remove-same-values [map* key* value*]
   (map
     (fn [row]
-      (remove (partial = v) row))
-    (get m k)))
+      (remove (partial = value*) row))
+    (get map* key*)))
 
-(defn filter-same-value [v data]
+(defn filter-same-value [value data]
   (zipmap
     [:rows :cols]
     (map
-      #(remove-same-values data % v)
+      #(remove-same-values data % value)
       (keys data)))
   )
 
-(loop [rem nums data boards-data previous-num (first nums)]
+(loop [remaining nums data boards-data previous-num (first nums)]
   (let [finished-boards (finished-boards data)]
 
     (if (not (empty? finished-boards))
@@ -78,20 +79,18 @@
              (apply +)))
 
       (recur
-        (rest rem)
-        (map
-          (partial filter-same-value (first rem))
-          data)
-        (first rem)))))
+        (rest remaining)
+        (map (partial filter-same-value (first remaining)) data)
+        (first remaining)))))
 
-; part 2
+; part 2 (doesn't work)
 
-(loop [rem nums data boards-data]
+(loop [remaining nums data boards-data]
   (if (= 1 (count data))
     (*
-      (first rem)
+      (first remaining)
       (->> data
-           (map (partial filter-same-value (first rem)))
+           (map (partial filter-same-value (first remaining)))
            (first)
            (vals)
            (first)
@@ -99,9 +98,9 @@
            (apply +)))
 
     (recur
-      (rest rem)
+      (rest remaining)
       (->> data
-           (map (partial filter-same-value (first rem)))
+           (map (partial filter-same-value (first remaining)))
            (remove
              (fn [board]
                (->> board

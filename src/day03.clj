@@ -12,7 +12,7 @@
        (first)
        (count)
        (range)
-       (map (fn [i] (map #(nth % i) characters)))
+       (map (fn [index] (map #(nth % index) characters)))
        (map frequencies)
        (map (partial sort-by val >))))
 
@@ -31,7 +31,7 @@
        (first)
        (count)
        (range)
-       (map (fn [i] (map #(nth % i) characters)))
+       (map (fn [index] (map #(nth % index) characters)))
        (map frequencies)
        (map
          #(sort
@@ -40,13 +40,13 @@
             %))))
 
 (defn walk [preferred-digit]
-  (loop [rem characters i 0]
-    (if (= 1 (count rem))
-      (first rem)
-      (let [freqs (nth (frequencies'' rem (if (zero? preferred-digit) 1 -1)) i)
+  (loop [remaining characters i 0]
+    (if (= 1 (count remaining))
+      (first remaining)
+      (let [freqs (nth (frequencies'' remaining (if (zero? preferred-digit) 1 -1)) i)
             common-bit (first (nth freqs preferred-digit))]
         (recur
-          (filter #(= common-bit (nth % i)) rem)
+          (filter #(= common-bit (nth % i)) remaining)
           (inc i)))
       )))
 
