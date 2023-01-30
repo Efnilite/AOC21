@@ -1,6 +1,5 @@
 (ns day04
-  (:require
-    [clojure.string :as str]))
+  (:require [clojure.string :as str]))
 
 ; part 1
 
