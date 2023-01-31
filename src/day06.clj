@@ -8,10 +8,7 @@
                          (frequencies)))
 
 (defn add [x y]
-  (let [x (if x x 0)
-        y (if y y 0)]
-    (+ x y))
-  )
+  (+ (if x x 0) (if y y 0)))
 
 (defn step [states]
   (as-> states states
@@ -19,16 +16,9 @@
 
         (into {} states)
 
-        (update states
-                8
-                (partial add (->> states
-                                  (filter (comp (partial = -1) first))
-                                  (last)
-                                  (last))))
+        (update states 8 (partial add (->> states (filter (comp (partial = -1) first)) (last) (last))))
 
-        (update states
-                6
-                (partial add (get states -1)))
+        (update states 6 (partial add (get states -1)))
 
         (dissoc states -1)))
 
@@ -38,8 +28,7 @@
        (take (inc day))
        (map vals)
        (map (partial apply +))
-       (last))
-  )
+       (last)))
 
 (lanternfish-count 80)
 
