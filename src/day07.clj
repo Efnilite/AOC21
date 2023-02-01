@@ -15,8 +15,8 @@
 
 (->> (range (apply min positions) (inc (apply max positions)))
      (map (fn [new-pos]
-            (map #(let [distance (Math/abs (- % new-pos))]
-                    (/ (* distance (inc distance)) 2))      ; direct formula for sum
-                 positions)))
-     (map (partial reduce +))
+            (->> positions
+                 (map (fn [current-pos] (Math/abs (- current-pos new-pos))))
+                 (map (fn [distance] (/ (* distance (inc distance)) 2)))
+                 (reduce +))))
      (apply min))

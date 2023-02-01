@@ -1,12 +1,14 @@
 (ns day05
   (:require [clojure.string :as str]))
 
+(def nums (->> (slurp "resources/05.txt")
+               (str/split-lines)
+               (map (partial re-seq #"\d+"))
+               (map (partial map #(Integer/parseInt %)))))
+
 ; part 1
 
-(->> (slurp "resources/05.txt")
-     (str/split-lines)
-     (map (partial re-seq #"\d+"))
-     (map (partial map #(Integer/parseInt %)))
+(->> nums
      (filter (fn [coords] (or (= (nth coords 0) (nth coords 2))
                          (= (nth coords 1) (nth coords 3)))))
      (map (fn [coords] (let [dx [(nth coords 0) (nth coords 2)]
@@ -25,10 +27,7 @@
 
 ; part 2
 
-(->> (slurp "resources/05.txt")
-     (str/split-lines)
-     (map (partial re-seq #"\d+"))
-     (map (partial map #(Integer/parseInt %)))
+(->> nums
      (filter (fn [coords] (or (= (nth coords 0) (nth coords 2))
                          (= (nth coords 1) (nth coords 3))
                          (= (Math/abs (- (nth coords 0) (nth coords 2)))
@@ -50,4 +49,3 @@
      (sort-by val)
      (filter #(< 1 (second %)))
      (count))
-
