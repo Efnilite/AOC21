@@ -33,24 +33,20 @@
 (->> (slurp "resources/08.txt")
      (re-seq #"([\w ]+)\|([\w ]+)")
      (map (fn [lines]
-               (->> lines
-                    (drop 1)
-                    (map str/trim)
-                    (map #(str/split % #" "))
-                    (first)
-                    (map (fn [number]
-                              (let [possible-numbers (get number-sizes (count number))]
-                                   (->> number
-                                        (seq)
-                                        (map #(assoc {} % possible-numbers))
-                                        (into {})))))
-                    (apply merge-with concat)
-                    (map
-                         (fn [letter-occurrences]
-                              {(first letter-occurrences)
-                               (->> (last letter-occurrences)
-                                    (frequencies)
-                                    (sort-by val >))}
-                              )
-                         )
-                    ))))
+            (->> lines
+                 (drop 1)
+                 (map str/trim)
+                 (map #(str/split % #" "))
+                 (first)
+                 (map (fn [number]
+                        (let [possible-numbers (get number-sizes (count number))]
+                          (->> number
+                               (seq)
+                               (map #(assoc {} % possible-numbers))
+                               (into {})))))
+                 (apply merge-with concat)
+                 (map (fn [letter-occurrences]
+                        {(first letter-occurrences)
+                         (->> (last letter-occurrences)
+                              (frequencies)
+                              (sort-by val >))}))))))
