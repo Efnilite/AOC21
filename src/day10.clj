@@ -8,11 +8,12 @@
 
 (defn tread [string]
   (let [match (re-seq #"[\[\(\{\<][\>\}\)\]]" string)
-        first-chunk (first match)
-        empty?' (empty? match)]
-    [(if empty?' string (str/replace-first string first-chunk "")) (if empty?' nil first-chunk)]))
+        first-chunk (first match)]
+    (if (empty? match)
+      [string nil]
+      [(str/replace-first string first-chunk "") first-chunk])))
 
-(defn parse []
+(def final-states
   (->> (slurp "resources/10.txt")
        (str/split-lines)
        (map (fn [line]
@@ -22,7 +23,7 @@
                           (iterate (comp tread first) [line "()"]))))
        (map (comp tread first last))))
 
-(->> (parse)
+(->> final-states
      (filter second)
      (map (comp (partial get missing-char-points) last last))
      (apply +))
@@ -31,11 +32,10 @@
 
 (def add-char-points {\( 1 \[ 2 \{ 3 \< 4})
 
-(def scores (->> (parse)
+(def scores (->> final-states
                  (filter (comp not (partial second)))
-                 (map (fn [data]
-                        (->> data
-                             (first)
+                 (map (fn [[incomplete-string _]]
+                        (->> incomplete-string
                              (reverse)
                              (reduce (fn [current-score char]
                                        (+ (* current-score 5) (get add-char-points char)))
