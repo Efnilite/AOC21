@@ -45,3 +45,6 @@
 ; part 2
 
 (get-difference template pairs 40)
+
+; note: in the last method apparently all values get doubled for some reason and this took me 3 days to realize
+; todo optimize!
